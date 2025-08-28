@@ -1,62 +1,73 @@
-# CAR.org Report Downloader
+# CAR.org Report Workflow System
 
-Automatically downloads both county and city level buyer's guide reports from CAR.org Power BI dashboard.
+Complete automated workflow for downloading buyer's guide reports and generating updated monthly reports using AI.
 
-## ✅ WORKING FILES
+## ✅ CORE FILES
 
-- **`final_working_downloader.py`** - Complete working solution (county + city downloads)
-- **`extract_download_url.py`** - Core SharePoint extraction functions  
+- **`workflow_startup.py`** - Main interactive workflow script
+- **`final_working_downloader.py`** - Power BI county/city image downloader
+- **`simple_report_updater.py`** - AI-powered monthly report generator
+- **`monthly report sample.txt`** - Sample report template
 - **`README.md`** - This documentation
 
-## 🚀 Usage
+## 🚀 Quick Start
 
+### Prerequisites
 ```bash
-python final_working_downloader.py
+pip install -r requirements.txt
 ```
 
-Opens browser, you manually select each county from dropdown, and it automatically downloads both county and city level images.
+### Run Workflow
+```bash
+python workflow_startup.py
+```
 
-## 🎯 How It Works
+**Interactive 5-step guided workflow:**
+1. Download PNG files from CAR.org Marketing and SharePoint
+2. Prepare automated Power BI downloader
+3. Run Power BI downloader (downloads county/city images)
+4. MLSL BI portal tasks (bilingual instructions)
+5. Generate AI-updated monthly report
 
-1. **Opens Power BI page** in Chrome browser
-2. **Manual county selection** (you select from dropdown)
-3. **Automatically extracts both county and city SharePoint links** from Power BI table
-4. **Downloads county image** as `{county_order}.png`
-5. **Downloads all city images** as `{county_order}({city_order}).png`
+## 📁 Directory Organization
 
-## 📁 File Naming Format
+Creates organized monthly directories:
+```
+~/Downloads/SALA Report January 2025/
+├── 1Santa Clara.png, 2San Mateo.png, 3Alameda.png, 4San Francisco.png (manual)
+├── 1.png, 2.png, 3.png, 4.png (automated county files)
+├── 1(1).png, 1(2).png, 2(1).png... (automated city files)
+├── 6(1).png, 6(2).png, 6(3).png... (MLSL reports)
+└── monthly_report_updated.txt (AI-generated report)
+```
 
-- **County files**: `1.png`, `2.png`, `3.png`, `4.png`
-- **City files**: `1(1).png`, `1(2).png`, `1(3).png`, `2(1).png`, etc.
-- Format: County 1, City 3 = `1(3).png`
+## 🎯 Target Counties
 
-## 🏛️ Target Counties
+1. **Santa Clara County** → `1*.png`
+2. **San Mateo County** → `2*.png`  
+3. **Alameda County** → `3*.png`
+4. **San Francisco County** → `4*.png`
 
-1. Santa Clara County
-2. San Mateo County  
-3. San Francisco County
-4. Alameda County
+## 🤖 AI Report Features
 
-## 🔧 Technical Details
+- **Auto month increment**: 7月 → 8月
+- **Data extraction**: Analyzes PNG images for latest market data
+- **Smart percentages**: Uses "4%" not "4.0%", "与上月持平" for no change
+- **Chinese language**: Proper terms (上升/下降/增加/减少)
+- **Diff preview**: Shows changes before replacing sample file
 
-### SharePoint Link Extraction
-- **County links**: `column-index="2"` and `aria-colindex="4"`
-- **City links**: `column-index="3"` and `aria-colindex="5"`
-- Switches to Power BI iframe automatically
-- Extracts complete SharePoint sharing URLs
+## 🌐 Bilingual Support
 
-### Download Process
-- Uses proven regex pattern: `downloadUrl["\']?\s*[:=]\s*["\']([^"\']*)["\']`
-- Handles Unicode escapes in SharePoint URLs
-- Downloads with proper authentication headers
-- Creates files with systematic naming format
+Step 5 includes both English and Chinese instructions (English + 中文) for MLSL BI portal tasks.
 
 ## ✅ Success Rate
 
-- **100% success rate** for both county and city level downloads
-- **Manual-assisted approach** proven reliable and efficient
-- Downloads both county overview and detailed city breakdowns
+- **Dual naming support** for manual (1Santa Clara.png) and automated (1.png) files
+- **100% automation** for data download and report generation
+- **Organized workflow** with progress tracking
+- **Error resilient** with fallback options
+- **User-friendly** interactive bilingual navigation
 
-## 🎉 Results
+## 🎉 Complete Solution
 
-Successfully downloads complete set of buyer's guide reports covering both county-wide statistics and individual city data for comprehensive market analysis.
+End-to-end workflow from initial data download to final AI-generated monthly report, all organized in monthly directories with bilingual support.

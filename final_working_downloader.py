@@ -12,6 +12,32 @@ import time
 import requests
 import os
 import re
+from datetime import datetime
+
+def setup_work_directory():
+    """Setup work directory from environment or create new one"""
+    try:
+        # Try to get work directory from environment (set by workflow_startup.py)
+        work_dir = os.getenv('SALA_WORK_DIR')
+        
+        if not work_dir:
+            # Create new directory based on current month
+            current_month = datetime.now().strftime("%B %Y")
+            downloads_path = os.path.expanduser("~/Downloads")
+            work_dir = os.path.join(downloads_path, f"SALA Report {current_month}")
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists(work_dir):
+            os.makedirs(work_dir)
+            print(f"📁 Created work directory: {work_dir}")
+        else:
+            print(f"📁 Using work directory: {work_dir}")
+        
+        return work_dir
+        
+    except Exception as e:
+        print(f"❌ Error setting up work directory: {e}")
+        return os.getcwd()
 
 def setup_driver():
     """Setup Chrome driver with minimal options"""
@@ -67,7 +93,7 @@ def get_sharepoint_links_from_powerbi(driver):
         driver.switch_to.default_content()
         return {"county": [], "city": []}
 
-def download_image_file(sharing_url, filename):
+def download_image_file(sharing_url, filename, work_dir):
     """Download image file using proven SharePoint method"""
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36'
@@ -98,15 +124,16 @@ def download_image_file(sharing_url, filename):
         download_response = requests.get(download_url, headers=headers, stream=True)
         download_response.raise_for_status()
         
-        # Save the file
-        with open(filename, 'wb') as f:
+        # Save the file to work directory
+        filepath = os.path.join(work_dir, filename)
+        with open(filepath, 'wb') as f:
             for chunk in download_response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
         
-        file_size = os.path.getsize(filename)
-        print(f"✅ Downloaded: {filename} ({file_size:,} bytes)")
-        return filename
+        file_size = os.path.getsize(filepath)
+        print(f"✅ Downloaded: {filepath} ({file_size:,} bytes)")
+        return filepath
         
     except Exception as e:
         print(f"❌ Download failed for {filename}: {e}")
@@ -117,15 +144,18 @@ def main():
     print("🚀 Final Working County & City Downloader")
     print("="*50)
     print("Downloads both county and city level images")
-    print("Format: County 1(3).png = County 1, City 3")
+    print("Format: County 1.png, City 1(1).png = County 1, City 1")
     print("="*50)
+    
+    # Setup work directory
+    work_directory = setup_work_directory()
     
     # Target counties with their order numbers
     counties = [
         ("Santa Clara", 1),
         ("San Mateo", 2),
-        ("San Francisco", 3),
-        ("Alameda", 4)
+        ("Alameda", 3),
+        ("San Francisco", 4)
     ]
     
     driver = setup_driver()
@@ -135,7 +165,7 @@ def main():
         # Open Power BI page and wait for loading
         print("📍 Opening Power BI page...")
         driver.get("https://www.car.org/marketdata/interactive/buyersguide")
-        time.sleep(20)  # Wait for Power BI to fully load
+        time.sleep(3)  # Wait for Power BI to load
         print("✅ Page loaded")
         
         # Process each county
@@ -162,7 +192,7 @@ def main():
             if links_data['county']:
                 print(f"📥 Downloading county level image...")
                 county_filename = f"{county_order}.png"
-                if download_image_file(links_data['county'][0], county_filename):
+                if download_image_file(links_data['county'][0], county_filename, work_directory):
                     downloaded_files.append(county_filename)
             else:
                 print(f"❌ No county level link found")
@@ -175,7 +205,7 @@ def main():
                 # For now, download in the order they appear (which should be alphabetical)
                 for city_index, city_url in enumerate(links_data['city'], 1):
                     city_filename = f"{county_order}({city_index}).png"
-                    if download_image_file(city_url, city_filename):
+                    if download_image_file(city_url, city_filename, work_directory):
                         downloaded_files.append(city_filename)
                         print(f"   ✅ City {city_index} downloaded")
                     else:
