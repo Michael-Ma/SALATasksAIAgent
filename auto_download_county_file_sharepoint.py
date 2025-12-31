@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
-Download Alameda.png from SharePoint sharing link
+Download all 4 counties' files from SharePoint sharing link
 Uses Selenium to automate the download from SharePoint's web interface.
 
 Requirements:
     pip install selenium requests
-
-Usage:
-    python download_alameda_sharepoint.py
 """
 
 import os

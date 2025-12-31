@@ -159,7 +159,7 @@ class WorkflowGuide:
     def auto_download_step1(self):
         """Attempt to auto-download the four county PNGs from the SharePoint folder"""
         try:
-            from download_alameda_sharepoint import download_file_from_sharepoint
+            from auto_download_county_file_sharepoint import download_file_from_sharepoint
         except ImportError:
             print("❌ 未找到download_alameda_sharepoint模块")
             return False

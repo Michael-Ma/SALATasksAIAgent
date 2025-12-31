@@ -966,6 +966,23 @@ def click_clear_if_present(driver):
 def type_search_in_popup(driver, popup_id, county_name):
     """Type county name into the slicer search input inside the popup."""
     try:
+        # First, clear the search input completely
+        driver.execute_script(
+            """
+            const popupId = arguments[0];
+            const root = popupId ? document.getElementById(popupId) : document;
+            if (!root) return false;
+            const inp = root.querySelector('input.searchInput, input[aria-label="Search"]');
+            if (!inp) return false;
+            inp.value = '';
+            inp.dispatchEvent(new Event('input', {bubbles: true}));
+            inp.dispatchEvent(new Event('change', {bubbles: true}));
+            return true;
+            """,
+            popup_id,
+        )
+        time.sleep(0.3)  # Wait for search to clear
+
         input_el = driver.execute_script(
             """
             const popupId = arguments[0];
@@ -979,8 +996,7 @@ def type_search_in_popup(driver, popup_id, county_name):
             return False
         try:
             input_el.click()
-            input_el.send_keys(Keys.CONTROL + "a")
-            input_el.send_keys(Keys.DELETE)
+            input_el.clear()  # Use Selenium's clear method
             input_el.send_keys(county_name)
             input_el.send_keys(Keys.ENTER)
             debug(f"typed search in: {summarize_element(input_el)}")
