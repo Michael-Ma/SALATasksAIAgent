@@ -57,9 +57,9 @@ class WorkflowGuide:
         print()
 
         steps_info = [
+            "MLSL BI门户任务（登录、报告、邮件、转换）",
             "从SharePoint下载4个县的PNG文件",
             "运行Power BI下载器获取所有4个县和市级图像",
-            "MLSL BI门户任务（登录、报告、邮件、转换）",
             "使用AI生成更新的月度报告"
         ]
 
@@ -465,10 +465,10 @@ class WorkflowGuide:
     def run_workflow(self):
         """Main workflow execution"""
         steps = {
-            1: self.step_1,
-            2: self.step_2,
-            3: self.step_3,
-            4: self.step_4
+            1: self.step_3,  # MLSL BI Portal (moved to first)
+            2: self.step_1,  # SharePoint downloads
+            3: self.step_2,  # Power BI downloader
+            4: self.step_4   # AI report generation
         }
 
         print("🚀 开始CAR.org报告下载工作流程")
