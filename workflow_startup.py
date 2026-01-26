@@ -129,13 +129,13 @@ class WorkflowGuide:
         print("🔗 SharePoint网址: https://carorg.sharepoint.com/:f:/s/CAR-RE-PublicProducts/ElrCKkQh6_ZMpe5RIZgOohoB33WDC9L1NlkigRWlqWwvGg?e=Vi1XJZ")
         print()
 
-        # Offer automated SharePoint download attempt
-        if input("🤖  尝试自动从SharePoint下载所有4个县的PNG文件? (y/n): ").lower().strip() == 'y':
-            if self.auto_download_step1():
-                input("\n⏸️  自动下载完成。按Enter继续...")
-                return
-            else:
-                print("\n⚠️ 自动下载未成功，继续手动步骤。")
+        # Auto-run SharePoint download by default
+        print("🤖 自动从SharePoint下载所有4个县的PNG文件...")
+        if self.auto_download_step1():
+            input("\n⏸️  自动下载完成。按Enter继续...")
+            return
+        else:
+            print("\n⚠️ 自动下载未成功，继续手动步骤。")
 
         if input("🔗 打开CAR.org营销页面? (y/n): ").lower() == 'y':
             try:
@@ -242,10 +242,10 @@ class WorkflowGuide:
         print("   → San Francisco (文件: 4.png, 4(1).png, 4(2).png...)")
         print()
 
-        mode = 'm'
+        mode = 'a'
         if auto_exists:
-            mode = input("选择下载模式 [M 手动 / A 自动] (默认M): ").strip().lower() or 'm'
-        use_auto = auto_exists and mode == 'a'
+            mode = input("选择下载模式 [A 自动 / M 手动] (默认A): ").strip().lower() or 'a'
+        use_auto = auto_exists and mode != 'm'
         script_name = "final_working_downloader_auto.py" if use_auto else "final_working_downloader.py"
 
         print(f"🚀 启动下载器脚本 ({'自动选择县' if use_auto else '手动选择县'})...")
@@ -288,18 +288,22 @@ class WorkflowGuide:
         print("• 寻找'报告'、'收藏'或'我的报告'部分")
         print("• 使用在线转换器如PDF转PNG进行转换")
         print()
-        
-        # Optional: open the MLSL BI portal (only if user requests)
-        if input("🔗 需要现在打开 MLSL BI 门户吗? (y/n): ").lower().strip() == 'y':
-            try:
-                webbrowser.open("https://mlsl.aculist.com/BI")
-                print("✅ 已在浏览器中打开MLSL BI门户")
-            except Exception as e:
-                print(f"❌ 打开浏览器时出错: {e}")
-                print("请手动打开: https://mlsl.aculist.com/BI")
 
-        # Optional: auto convert and rename ZIP PDFs to PNGs
-        if input("🤖 需要自动将下载的 ZIP PDF 转成 6(x).png 并重命名吗? (y/n): ").lower().strip() == 'y':
+        # Auto-open the MLSL BI portal by default
+        print("🔗 自动打开 MLSL BI 门户...")
+        try:
+            webbrowser.open("https://mlsl.aculist.com/BI")
+            print("✅ 已在浏览器中打开MLSL BI门户")
+        except Exception as e:
+            print(f"❌ 打开浏览器时出错: {e}")
+            print("请手动打开: https://mlsl.aculist.com/BI")
+
+        input("\n⏸️  请在浏览器中完成登录和下载ZIP报告，完成后按Enter继续...")
+
+        # Auto convert and rename ZIP PDFs to PNGs by default
+        print("\n🤖 自动将下载的 ZIP PDF 转成 6(x).png...")
+        skip_convert = input("跳过PDF转换? (y/n, 默认n): ").lower().strip() == 'y'
+        if not skip_convert:
             try:
                 env = os.environ.copy()
                 env['SALA_WORK_DIR'] = self.work_directory
