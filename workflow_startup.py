@@ -159,12 +159,11 @@ class WorkflowGuide:
     def auto_download_step1(self):
         """Attempt to auto-download the four county PNGs from the SharePoint folder"""
         try:
-            from auto_download_county_file_sharepoint import download_file_from_sharepoint
+            from auto_download_county_file_sharepoint import download_all_files_from_sharepoint
         except ImportError:
-            print("❌ 未找到download_alameda_sharepoint模块")
+            print("❌ 未找到auto_download_county_file_sharepoint模块")
             return False
 
-        # Try to download all 4 county PNG files
         target_files = [
             "Santa Clara.png",
             "San Mateo.png",
@@ -172,23 +171,13 @@ class WorkflowGuide:
             "San Francisco.png"
         ]
 
-        downloaded_files = []
-        for filename in target_files:
-            print(f"\n{'='*60}")
-            print(f"📥 正在下载: {filename}")
-            print(f"{'='*60}")
+        print(f"🤖 使用单个浏览器会话下载所有 {len(target_files)} 个文件...")
 
-            result = download_file_from_sharepoint(
-                self.sharepoint_folder_url,
-                filename,
-                self.work_directory
-            )
-
-            if result:
-                downloaded_files.append(result)
-                print(f"✅ 成功下载: {filename}")
-            else:
-                print(f"❌ 下载失败: {filename}")
+        downloaded_files = download_all_files_from_sharepoint(
+            self.sharepoint_folder_url,
+            target_files,
+            self.work_directory
+        )
 
         # Summary
         print(f"\n{'='*60}")
